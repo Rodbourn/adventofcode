@@ -1,7 +1,6 @@
 ﻿namespace AdventOfCode2023
 {
     using Coordinate = (long x, long y);
-    using Pair = ((long x, long y) c1, (long x, long y) c2);
     internal class Day011
     {
         public static (string part1, string part2) Run(string input)
@@ -37,20 +36,19 @@
             ExpandGalaxy(galaxiesYIndex, expansionFactor - 1, false);
 
             var totalDistance = 0L;
-            var pairDistances = new HashSet<Pair>();
-            foreach (var galaxy in galaxies)
+            var galaxyArray = galaxies.ToArray();
+            for (int i = 0; i < galaxyArray.Length; i++)
             {
-                foreach (var otherGalaxy in galaxies)
+                var (x1, y1) = galaxyArray[i];
+                for (int j = i + 1; j < galaxyArray.Length; j++)
                 {
-                    if (otherGalaxy == galaxy) continue;
-                    var pair = GetNormalizedPair(galaxy, otherGalaxy);
-                    if (pairDistances.Contains(pair)) continue;
-                    var distance = Math.Abs(pair.c1.x - pair.c2.x) + Math.Abs(pair.c1.y - pair.c2.y);
-                    totalDistance += distance;
-                    pairDistances.Add(pair);
+                    var (x2, y2) = galaxyArray[j];
+                    var dx = x1 - x2;
+                    var dy = y1 - y2;
+                    totalDistance += (dx >= 0 ? dx : -dx) + (dy >= 0 ? dy : -dy);
                 }
             }
-
+            
             return totalDistance.ToString();
 
             void ExpandGalaxy(Dictionary<long, List<int>> galaxyDimensionIndexes, long expansionScale, bool inX)
@@ -74,10 +72,6 @@
                         galaxies[galaxyIndex] = c;
                     }
                 }
-            }
-            static Pair GetNormalizedPair(Coordinate point1, Coordinate point2)
-            {
-                return point1.CompareTo(point2) < 0 ? (point1, point2) : (point2, point1);
             }
         }
     }
